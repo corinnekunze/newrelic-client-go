@@ -89,26 +89,26 @@ var DashboardPermissionsTypes = struct {
 	PUBLIC_READ_WRITE: "PUBLIC_READ_WRITE",
 }
 
-// EntityAlertSeverity -
+// EntityAlertSeverity - The alert severity of the entity.
 type EntityAlertSeverity string
 
 var EntityAlertSeverityTypes = struct {
-	// Critical violation in progress
+	// Indicates an entity has a critical violation in progress.
 	CRITICAL EntityAlertSeverity
-	// Not alerting
+	// Indicates an entity has no violations and therefore is not alerting.
 	NOT_ALERTING EntityAlertSeverity
-	// No alert conditions set up
+	// Indicates an entity is not configured for alerting.
 	NOT_CONFIGURED EntityAlertSeverity
-	// Warning violation in progress
+	// Indicates an entity  has a warning violation in progress.
 	WARNING EntityAlertSeverity
 }{
-	// Critical violation in progress
+	// Indicates an entity has a critical violation in progress.
 	CRITICAL: "CRITICAL",
-	// Not alerting
+	// Indicates an entity has no violations and therefore is not alerting.
 	NOT_ALERTING: "NOT_ALERTING",
-	// No alert conditions set up
+	// Indicates an entity is not configured for alerting.
 	NOT_CONFIGURED: "NOT_CONFIGURED",
-	// Warning violation in progress
+	// Indicates an entity  has a warning violation in progress.
 	WARNING: "WARNING",
 }
 
@@ -912,8 +912,12 @@ var EntityRelationshipEdgeDirectionTypes = struct {
 type EntityRelationshipEdgeType string
 
 var EntityRelationshipEdgeTypeTypes = struct {
+	// The target entity contains the code for the source entity.
+	BUILT_FROM EntityRelationshipEdgeType
 	// The source entity calls the target entity.
 	CALLS EntityRelationshipEdgeType
+	// The source entity has a connection to the target entity.
+	CONNECTS_TO EntityRelationshipEdgeType
 	// The source entity contains the target entity.
 	CONTAINS EntityRelationshipEdgeType
 	// The source entity hosts the target.
@@ -923,8 +927,12 @@ var EntityRelationshipEdgeTypeTypes = struct {
 	// The source is an Application that serves the target Browser application.
 	SERVES EntityRelationshipEdgeType
 }{
+	// The target entity contains the code for the source entity.
+	BUILT_FROM: "BUILT_FROM",
 	// The source entity calls the target entity.
 	CALLS: "CALLS",
+	// The source entity has a connection to the target entity.
+	CONNECTS_TO: "CONNECTS_TO",
 	// The source entity contains the target entity.
 	CONTAINS: "CONTAINS",
 	// The source entity hosts the target.
@@ -941,8 +949,12 @@ var EntityRelationshipEdgeTypeTypes = struct {
 type EntityRelationshipType string
 
 var EntityRelationshipTypeTypes = struct {
+	// The source repository containing the code for the target
+	BUILT_FROM EntityRelationshipType
 	// The source entity calls the target entity.
 	CALLS EntityRelationshipType
+	// The source establishes TCP connections to the target
+	CONNECTS_TO EntityRelationshipType
 	// The source entity contains the target entity
 	CONTAINS EntityRelationshipType
 	// The source entity hosts the target
@@ -954,8 +966,12 @@ var EntityRelationshipTypeTypes = struct {
 	// Type not known
 	UNKNOWN EntityRelationshipType
 }{
+	// The source repository containing the code for the target
+	BUILT_FROM: "BUILT_FROM",
 	// The source entity calls the target entity.
 	CALLS: "CALLS",
+	// The source establishes TCP connections to the target
+	CONNECTS_TO: "CONNECTS_TO",
 	// The source entity contains the target entity
 	CONTAINS: "CONTAINS",
 	// The source entity hosts the target
@@ -1335,6 +1351,32 @@ type Actor struct {
 	EntitySearch EntitySearch `json:"entitySearch,omitempty"`
 }
 
+// AgentApplicationSettingsApmBase - Settings that are applicable to APM applications and their agents.
+type AgentApplicationSettingsApmBase struct {
+	// General settings for the application can be accessed via this field.
+	ApmConfig AgentApplicationSettingsApmConfig `json:"apmConfig"`
+}
+
+// AgentApplicationSettingsApmConfig - General settings related to APM applications.
+type AgentApplicationSettingsApmConfig struct {
+	// The desired target for the APDEX measurement of this application.
+	ApdexTarget float64 `json:"apdexTarget,omitempty"`
+	// Should agents for this APM application get some of their configuration from the server.
+	UseServerSideConfig bool `json:"useServerSideConfig,omitempty"`
+}
+
+// AgentApplicationSettingsBrowserBase - Settings that are applicable to APM applications and their agents.
+type AgentApplicationSettingsBrowserBase struct {
+	// General settings for the application can be accessed via this field.
+	BrowserConfig AgentApplicationSettingsBrowserConfig `json:"browserConfig"`
+}
+
+// AgentApplicationSettingsBrowserConfig - General settings related to APM applications.
+type AgentApplicationSettingsBrowserConfig struct {
+	// The desired target for the APDEX measurement of the browser or 'end user' experience of this application.
+	ApdexTarget float64 `json:"apdexTarget,omitempty"`
+}
+
 // AgentEnvironmentApplicationInstance - Representation of the New Relic agent collecting data.
 type AgentEnvironmentApplicationInstance struct {
 	// Contains environment attributes regarding the reported setting of the reporting agent.
@@ -1465,6 +1507,8 @@ type ApmApplicationEntity struct {
 	AlertViolations []EntityAlertViolation `json:"alertViolations,omitempty"`
 	// Summary statistics about the Browser App injected by an APM Application.
 	ApmBrowserSummary ApmBrowserApplicationSummaryData `json:"apmBrowserSummary,omitempty"`
+	// Settings for APM applications.
+	ApmSettings AgentApplicationSettingsApmBase `json:"apmSettings,omitempty"`
 	// Summary statistics about the APM App.
 	ApmSummary ApmApplicationSummaryData `json:"apmSummary,omitempty"`
 	// The ID of the APM Application.
@@ -1552,6 +1596,11 @@ func (x ApmApplicationEntity) GetAlertViolations() []EntityAlertViolation {
 // GetApmBrowserSummary returns a pointer to the value of ApmBrowserSummary from ApmApplicationEntity
 func (x ApmApplicationEntity) GetApmBrowserSummary() ApmBrowserApplicationSummaryData {
 	return x.ApmBrowserSummary
+}
+
+// GetApmSettings returns a pointer to the value of ApmSettings from ApmApplicationEntity
+func (x ApmApplicationEntity) GetApmSettings() AgentApplicationSettingsApmBase {
+	return x.ApmSettings
 }
 
 // GetApmSummary returns a pointer to the value of ApmSummary from ApmApplicationEntity
@@ -2597,6 +2646,8 @@ type BrowserApplicationEntity struct {
 	AlertViolations []EntityAlertViolation `json:"alertViolations,omitempty"`
 	// The ID of the Browser App.
 	ApplicationID int `json:"applicationId,omitempty"`
+	// Settings that are common to browser applications.
+	BrowserSettings AgentApplicationSettingsBrowserBase `json:"browserSettings,omitempty"`
 	// Summary statistics about the Browser App.
 	BrowserSummary BrowserApplicationSummaryData `json:"browserSummary,omitempty"`
 	// The entity's domain
@@ -2683,6 +2734,11 @@ func (x BrowserApplicationEntity) GetAlertViolations() []EntityAlertViolation {
 // GetApplicationID returns a pointer to the value of ApplicationID from BrowserApplicationEntity
 func (x BrowserApplicationEntity) GetApplicationID() int {
 	return x.ApplicationID
+}
+
+// GetBrowserSettings returns a pointer to the value of BrowserSettings from BrowserApplicationEntity
+func (x BrowserApplicationEntity) GetBrowserSettings() AgentApplicationSettingsBrowserBase {
+	return x.BrowserSettings
 }
 
 // GetBrowserSummary returns a pointer to the value of BrowserSummary from BrowserApplicationEntity
@@ -5811,6 +5867,8 @@ type MetricNormalizationRule struct {
 	CreatedAt *nrtime.EpochMilliseconds `json:"createdAt,omitempty"`
 	// Is rule enabled?
 	Enabled bool `json:"enabled"`
+	// Rule evaluation order
+	EvalOrder int `json:"evalOrder,omitempty"`
 	// Rule Id
 	ID int `json:"id"`
 	// Metric Match Expression.
@@ -5819,6 +5877,8 @@ type MetricNormalizationRule struct {
 	Notes string `json:"notes,omitempty"`
 	// Metric Replacement Expression.
 	Replacement string `json:"replacement,omitempty"`
+	// Whether it terminates the evaluation chain or not
+	TerminateChain bool `json:"terminateChain,omitempty"`
 }
 
 // MobileAppSummaryData - Mobile application summary data
@@ -6174,7 +6234,14 @@ func (x *MobileApplicationEntityOutline) ImplementsEntityOutline() {}
 
 // NRQLQueryOptions - Additional options for NRQL queries.
 type NRQLQueryOptions struct {
-	// Limit the NRQL query to return results from the chosen [Event Namespaces](https://docs.newrelic.com/docs/accounts/new-relic-account-usage/getting-started-usage/insights-subscription-usage/#namespace).
+	// Limit the NRQL query to return results from the chosen Event Namespaces.
+	//
+	// You must supply at least 1 valid event namespace when using this option.
+	// Invalid event namespaces will be filtered out.
+	//
+	// If omitted, the default list will be `["Default"]`
+	//
+	// For more details about Event Namespaces, visit our [docs](https://docs.newrelic.com/docs/accounts/new-relic-account-usage/getting-started-usage/insights-subscription-usage/#namespace).
 	EventNamespaces []string `json:"eventNamespaces"`
 }
 

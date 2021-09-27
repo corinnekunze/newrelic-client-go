@@ -399,10 +399,12 @@ const getEntitiesQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		recentAlertViolations {
 			agentUrl
@@ -531,10 +533,12 @@ const getEntitiesQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		recentAlertViolations {
 			agentUrl
@@ -795,10 +799,12 @@ const getEntitiesQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		mobileSummary {
 			appLaunchCount
@@ -1195,10 +1201,12 @@ const getEntityQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		recentAlertViolations {
 			agentUrl
@@ -1327,10 +1335,12 @@ const getEntityQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		recentAlertViolations {
 			agentUrl
@@ -1591,10 +1601,12 @@ const getEntityQuery = `query(
 			applicationName
 			createdAt
 			enabled
+			evalOrder
 			id
 			matchExpression
 			notes
 			replacement
+			terminateChain
 		}
 		mobileSummary {
 			appLaunchCount
